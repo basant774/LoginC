@@ -5,9 +5,15 @@
 #define MAX_USERNAME_LENGTH 20
 #define MAX_PASSWORD_LENGTH 20
 
+typedef union {
+    int flag;
+    char active[2];
+} Flag;
+
 typedef struct {
     char username[MAX_USERNAME_LENGTH];
     char password[MAX_PASSWORD_LENGTH];
+    Flag activeFlag;
 } User;
 
 User users[MAX_USERS];
@@ -16,12 +22,16 @@ int totalUsers = 0;
 void registerUser() {
     char username[MAX_USERNAME_LENGTH];
     char password[MAX_PASSWORD_LENGTH];
+    int active;
 
     printf("Please enter your username: ");
     scanf("%s", username);
 
     printf("Please enter your password: ");
     scanf("%s", password);
+
+    printf("Please enter 1 for active or 0 for inactive: ");
+    scanf("%d", &active);
 
     if (totalUsers >= MAX_USERS) {
         printf("Cannot register more users.\n");
@@ -30,6 +40,7 @@ void registerUser() {
 
     strcpy(users[totalUsers].username, username);
     strcpy(users[totalUsers].password, password);
+    users[totalUsers].activeFlag.flag = active;
     totalUsers++;
 
     printf("User registered successfully.\n");
@@ -49,8 +60,12 @@ void loginUser() {
 
     for (int i = 0; i < totalUsers; i++) {
         if (strcmp(users[i].username, username) == 0 && strcmp(users[i].password, password) == 0) {
-            printf("Login successful.\n");
-            loggedIn = 1;
+            if (users[i].activeFlag.flag) {
+                printf("Login successful.\n");
+                loggedIn = 1;
+            } else {
+                printf("User is inactive. Please contact the administrator.\n");
+            }
             break;
         }
     }
